@@ -16,6 +16,7 @@ from dowhy.gcm.auto import AssignmentQuality
 from graphviz import Digraph
 from IPython.display import Image, display
 
+
 class ScmBuilder:
     """
     A builder class to construct a Structural Causal Model (SCM) from a given set of edges
@@ -147,7 +148,6 @@ class ScmBuilder:
             self.visualize_graph()
         return self.build_scm(df)
 
-    
 
 class CausalRootCauseAnalyzer:
     """
@@ -369,6 +369,10 @@ class CausalRootCauseAnalyzer:
         path_nodes = [node for node, _ in path]
         consistency_score = self._evaluate_causal_consistency(path_nodes)
         
+        # Fallback to 0 if consistency_score is NaN
+        if np.isnan(consistency_score):
+            consistency_score = 0.0
+        
         # Combine scores with theoretical weights
         return 0.7 * root_noise + 0.3 * consistency_score
 
@@ -381,12 +385,20 @@ class CausalRootCauseAnalyzer:
             current = path_nodes[i]
             next_node = path_nodes[i + 1]
             
-            if current in self.noise_contributions and next_node in self.noise_contributions:
-                correlation = np.corrcoef(
-                    self.noise_contributions[current], 
-                    self.noise_contributions[next_node]
-                )[0, 1]
-                consistency_scores.append(abs(correlation))
+            curr_array = self.noise_contributions.get(current, [0])
+            next_array = self.noise_contributions.get(next_node, [0])
+            
+            # If there are not enough data points, skip the correlation calculation.
+            if len(curr_array) < 2 or len(next_array) < 2:
+                continue
+            
+            correlation_matrix = np.corrcoef(curr_array, next_array)
+            correlation = correlation_matrix[0, 1]
+            
+            # Replace NaN correlations with 0
+            if np.isnan(correlation):
+                correlation = 0.0
+            consistency_scores.append(abs(correlation))
                 
         return np.mean(consistency_scores) if consistency_scores else 0.0
 
