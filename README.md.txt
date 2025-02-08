@@ -29,37 +29,23 @@ Inspired by the paper:
   Visualize causal pathways with Graphviz diagrams, using gradient backgrounds to indicate path importance via `CausalResultsVisualizer`.
 
 - **End-to-End Example:**  
-  A complete example of the workflow is provided in the Jupyter Notebook `test.ipynb`.
+  A complete example of the workflow is provided in the Jupyter Notebook `notebooks/test.ipynb`.
 
 ## Project Structure
 
 ```
-.
-├── anomaly.py                # Contains the AnomalyDetector class for anomaly detection & visualization.
-├── create_synthetic_data.py  # Script for generating synthetic, realistic transactional data.
-├── pathway.py                # Contains:
-│   ├── ScmBuilder            # Builds and visualizes the causal graph and SCM.
-│   ├── CausalRootCauseAnalyzer # Performs multi-hop causal path discovery and ranking.
-│   └── CausalResultsVisualizer # Visualizes the discovered root cause pathways.
-├── test.ipynb                # End-to-end example demonstrating the complete workflow.
-├── README.md                 # This file.
-└── requirements.txt          # List of required Python packages.
+ProRca/
+├── src/                  # Source code directory
+│   ├── __init__.py
+│   ├── anomaly.py
+│   ├── create_synthetic_data.py
+│   ├── pathway.py
+├── notebooks/            # Jupyter notebooks for demonstrations
+│   ├── test.ipynb
+├── README.md                 # Documentation
+├── .gitignore            # Git ignore file
+├── requirements.txt      # Dependencies list
 ```
-
-## Dependencies
-
-- Python 3.7+
-- [DoWhy](https://github.com/py-why/dowhy)
-- [NetworkX](https://networkx.org/)
-- [Graphviz](https://graphviz.org/)
-- [IPython](https://ipython.org/)
-- [Matplotlib](https://matplotlib.org/)
-- [Seaborn](https://seaborn.pydata.org/)
-- [ADTK](https://github.com/arundo/adtk)
-- [Pandas](https://pandas.pydata.org/)
-- [NumPy](https://numpy.org/)
-
-Ensure Graphviz is installed (`brew install graphviz` on macOS or the equivalent on your OS).
 
 ## Installation
 
@@ -75,14 +61,14 @@ pip install -r requirements.txt
 
 ### 1. Generate Synthetic Data
 ```python
-from create_synthetic_data import generate_fashion_data_with_brand
+from src.create_synthetic_data import generate_fashion_data_with_brand
 
 df = generate_fashion_data_with_brand(start_date="2023-01-01", end_date="2023-12-31")
 ```
 
 ### 2. Inject Anomalies
 ```python
-from create_synthetic_data import inject_anomalies_by_date
+from src.create_synthetic_data import inject_anomalies_by_date
 
 anomaly_schedule = {
     '2023-06-10': ('ExcessiveDiscount', 0.8),
@@ -95,7 +81,7 @@ df_anomalous = inject_anomalies_by_date(df, anomaly_schedule)
 
 ### 3. Detect Anomalies
 ```python
-from anomaly import AnomalyDetector
+from src.anomaly import AnomalyDetector
 
 detector = AnomalyDetector(df_anomalous, date_col="ORDERDATE", value_col="PROFIT_MARGIN")
 anomalies = detector.detect()
@@ -106,7 +92,7 @@ detector.visualize(figsize=(12, 6), ylim=(40, 60))
 
 ### 4. Build the Structural Causal Model (SCM)
 ```python
-from pathway import ScmBuilder
+from src.pathway import ScmBuilder
 
 edges = [
     ("PRICEEACH", "UNIT_COST"), ("PRICEEACH", "SALES"),
@@ -130,7 +116,7 @@ scm = builder.build(df_anomalous)
 
 ### 5. Perform Causal Root Cause Analysis
 ```python
-from pathway import CausalRootCauseAnalyzer
+from src.pathway import CausalRootCauseAnalyzer
 
 analyzer = CausalRootCauseAnalyzer(scm, min_score_threshold=0.8)
 results = analyzer.analyze(df_anomalous, anomaly_dates, start_node='PROFIT_MARGIN')
@@ -138,12 +124,11 @@ results = analyzer.analyze(df_anomalous, anomaly_dates, start_node='PROFIT_MARGI
 
 ### 6. Visualize Causal Pathways
 ```python
-from pathway import CausalResultsVisualizer
+from src.pathway import CausalResultsVisualizer
 
 visualizer = CausalResultsVisualizer(analysis_results=results)
 visualizer.plot_root_cause_paths()
 ```
 
 ### 7. Run the End-to-End Example
-Open `test.ipynb` in Jupyter to see the complete workflow.
-
+Open `notebooks/test.ipynb` in Jupyter to see the complete workflow.
