@@ -93,6 +93,8 @@ anomaly_dates = detector.get_anomaly_dates()
 detector.visualize(figsize=(12, 6), ylim=(40, 60))
 ```
 
+![Anomaly](https://github.com/Economist-Ahmed-Dawoud/ProRca/blob/main/Results/anom.png)
+
 ### 4. Build the Structural Causal Model (SCM)
 
 ```python
