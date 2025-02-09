@@ -136,6 +136,9 @@ visualizer = CausalResultsVisualizer(analysis_results=results)
 visualizer.plot_root_cause_paths()
 ```
 
+![RCA Pathways](https://github.com/Economist-Ahmed-Dawoud/ProRca/blob/main/Results/Dates.png)
+![RCA Pathways](https://github.com/Economist-Ahmed-Dawoud/ProRca/blob/main/Results/output.png)
+
 ### 7. Run the End-to-End Example
 
 Open `notebooks/test.ipynb` in Jupyter to see the complete workflow.
